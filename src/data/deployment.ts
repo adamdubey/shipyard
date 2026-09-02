@@ -8,10 +8,15 @@ export interface DeploymentInfo {
   buildTimestamp: string
 }
 
+const environment =
+  (import.meta.env.VITE_DEPLOYMENT_ENVIRONMENT as DeploymentEnvironment | undefined) ??
+  'local'
+
 export const deployment: DeploymentInfo = {
-  environment: 'local',
-  prNumber: '—',
-  branch: 'local-development',
-  commitSha: 'dev',
-  buildTimestamp: new Date().toISOString(),
+  environment,
+  prNumber: import.meta.env.VITE_PR_NUMBER ?? '—',
+  branch: import.meta.env.VITE_BRANCH_NAME ?? 'local-development',
+  commitSha: import.meta.env.VITE_COMMIT_SHA ?? 'dev',
+  buildTimestamp:
+    import.meta.env.VITE_BUILD_TIMESTAMP ?? new Date().toISOString(),
 }

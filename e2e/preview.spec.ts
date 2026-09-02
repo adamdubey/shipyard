@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('Shipyard application loads', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
 
   await expect(
     page.getByRole('heading', {
@@ -11,7 +11,7 @@ test('Shipyard application loads', async ({ page }) => {
 })
 
 test('deployment information is visible', async ({ page }) => {
-  await page.goto('/')
+  await page.goto('./')
 
   await expect(
     page.getByText(/environment/i).first(),
@@ -32,7 +32,7 @@ test('preview contains GitHub build metadata', async ({ page }) => {
     'GitHub metadata validation only runs against deployed PR previews',
   )
 
-  await page.goto('/')
+  await page.goto('./')
 
   await expect(
     page.getByText('PREVIEW'),

@@ -1,0 +1,85 @@
+#root {
+  width: 100%;
+}
+
+.app {
+  width: min(720px, calc(100% - 2rem));
+  margin: 4rem auto;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.header h1 {
+  margin: 0.4rem 0 0;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+}
+
+.deployment-card,
+.status-card {
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #334155;
+  border-radius: 12px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.environment-badge {
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #64748b;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.deployment-info {
+  margin: 0;
+}
+
+.deployment-info div {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #1e293b;
+}
+
+.deployment-info div:last-child {
+  border-bottom: 0;
+}
+
+.deployment-info dt {
+  color: #94a3b8;
+}
+
+.deployment-info dd {
+  margin: 0;
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.status-card h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.status-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  line-height: 2;
+}

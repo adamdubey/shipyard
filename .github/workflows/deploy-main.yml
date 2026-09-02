@@ -1,0 +1,80 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages-write
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set build timestamp
+        run: |
+          echo "VITE_BUILD_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
+      - name: Build production
+        env:
+          VITE_DEPLOYMENT_ENVIRONMENT: production
+          VITE_PR_NUMBER: "—"
+          VITE_BRANCH_NAME: main
+          VITE_COMMIT_SHA: ${{ github.sha }}
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Checkout Pages branch
+        uses: actions/checkout@v7
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Replace production files
+        run: |
+          find pages \
+            -mindepth 1 \
+            -maxdepth 1 \
+            ! -name '.git' \
+            ! -name 'pr-*' \
+            -exec rm -rf {} +
+
+          cp -R dist/. pages/
+
+          touch pages/.nojekyll
+
+      - name: Commit production deployment
+        working-directory: pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No production changes to commit"
+            exit 0
+          fi
+
+          git commit -m "deploy: update production from ${GITHUB_SHA}"
+          git push

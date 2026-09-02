@@ -35,7 +35,7 @@ test('preview contains GitHub build metadata', async ({ page }) => {
   await page.goto('./')
 
   await expect(
-    page.getByText('PREVIEW'),
+    page.getByText('PREVIEW', { exact: true }),
   ).toBeVisible()
 
   await expect(

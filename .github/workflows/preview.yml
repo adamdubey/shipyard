@@ -1,0 +1,66 @@
+name: PR Preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    name: Build and deploy preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build preview
+        env:
+          VITE_DEPLOYMENT_ENVIRONMENT: preview
+          VITE_PR_NUMBER: ${{ github.event.pull_request.number }}
+          VITE_BRANCH_NAME: ${{ github.head_ref }}
+          VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          VITE_BUILD_TIMESTAMP: ${{ github.event.pull_request.updated_at }}
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
+        run: npm run build
+
+      - name: Checkout Pages branch
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: pages
+
+      - name: Replace PR preview
+        run: |
+          rm -rf "pages/pr-${{ github.event.pull_request.number }}"
+          mkdir -p "pages/pr-${{ github.event.pull_request.number }}"
+          cp -R dist/. "pages/pr-${{ github.event.pull_request.number }}/"
+
+      - name: Commit preview
+        working-directory: pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if git diff --cached --quiet; then
+            echo "No preview changes to commit"
+            exit 0
+          fi
+
+          git commit -m "deploy: update PR #${{ github.event.pull_request.number }} preview"
+          git push
